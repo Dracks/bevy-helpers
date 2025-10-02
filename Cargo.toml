@@ -1,0 +1,14 @@
+[package]
+name = "bevy_tools"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+members=["crates/*"]
+resolver="2"
+
+[workspace.dependencies]
+assets_generator = {path="crates/assets_generator"}
+
+[dependencies]
+assets_generator = { workspace = true}
