@@ -3,15 +3,16 @@ use std::io::Write;
 use std::path::Path;
 use stringcase::Caser;
 
-pub fn build_assets_enum(dest_path: &Path, name: Option<String>){
+pub fn build_assets_enum(dest_path: &Path, src_path: Option<&Path>, name: Option<String>){
     let name = name.unwrap_or("FileAssets".into());
     let mut f = fs::File::create(&dest_path).unwrap();
+    let src_path = src_path.unwrap_or(Path::new("assets"));
     writeln!(f, "use bevy::prelude::*;").unwrap();
     writeln!(f).unwrap();
     writeln!(f, "#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]").unwrap();
     writeln!(f, "pub enum {name} {{").unwrap();
 
-    let assets = collect_assets("assets").unwrap_or_default();
+    let assets = collect_assets(src_path).unwrap_or_default();
 
     for (enum_name, _) in &assets {
         writeln!(f, "    #[allow(dead_code)]").unwrap();
@@ -48,9 +49,9 @@ pub fn build_assets_enum(dest_path: &Path, name: Option<String>){
 
     println!("cargo:rerun-if-changed=assets");
 }
-fn collect_assets(dir: &str) -> Result<Vec<(String, String)>, std::io::Error> {
+fn collect_assets(dir: &Path) -> Result<Vec<(String, String)>, std::io::Error> {
     let mut assets = Vec::new();
-    collect_assets_recursive(Path::new(dir), dir, &mut assets)?;
+    collect_assets_recursive(dir, dir.to_str().unwrap_or_default(), &mut assets)?;
     Ok(assets)
 }
 
@@ -92,6 +93,7 @@ fn sanitize_enum_name(relative_path: &str) -> String {
     } else {
         relative_path
     };
+
 
     // Convert path separators and special characters to underscores
     let sanitized = path_without_extension
