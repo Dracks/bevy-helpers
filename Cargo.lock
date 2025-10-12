@@ -1376,7 +1376,7 @@ dependencies = [
 name = "bevy_tools"
 version = "0.1.0"
 dependencies = [
- "assets_generator",
+ "bevy",
  "ui_helpers",
 ]
 
@@ -4432,7 +4432,7 @@ checksum = "f8c1ae7cc0fdb8b842d65d127cb981574b0d2b249b74d1c7a2986863dc134f71"
 
 [[package]]
 name = "ui_helpers"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "bevy",
 ]

@@ -13,5 +13,5 @@ ui_helpers = {path="crates/ui_helpers"}
 bevy = { version = "0.17.2" }
 
 [dependencies]
-assets_generator = { workspace = true }
+bevy = { workspace = true }
 ui_helpers = { workspace = true }

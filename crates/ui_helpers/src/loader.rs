@@ -18,8 +18,8 @@ impl<T> LoadingPlugin<T> {
 impl<T: States+ FreelyMutableState+Copy> Plugin for LoadingPlugin<T> {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, handle_loading::<T>)
+            .add_systems(Update, count_timer)
             .insert_resource(LoadFiles::default());
-
     }
 }
 
@@ -30,6 +30,12 @@ pub struct LoadFiles {
 }
 
 impl LoadFiles {
+    pub fn from_duration(wait_duration: f32) -> Self {
+        Self {
+            wait_time: Timer::from_seconds(wait_duration, TimerMode::Once),
+            ..Default::default()
+        }
+    }
     pub fn from_time(wait_time: Timer) -> Self {
         Self {
             wait_time,
@@ -81,16 +87,19 @@ impl<T: States> Loading<T> {
     }
 }
 
+fn count_timer(mut status: ResMut<LoadFiles>, time: Res<Time>) {
+    if status.wait_time.is_finished() {
+        return
+    }
+    status.wait_time.tick(time.delta());
+}
+
 fn handle_loading<T: States+ FreelyMutableState+Copy>(
     next_step: Single<&Loading<T>>,
     mut next_state: ResMut<NextState<T>>,
-    mut status: ResMut<LoadFiles>,
-    time: Res<Time>,
+    status: Res<LoadFiles>,
     asset_server: Res<AssetServer>
 ){
-    if !status.wait_time.is_finished() {
-        status.wait_time.tick(time.delta());
-    }
 
     if status.is_complete(&asset_server) {
         next_state.set(next_step.next);
