@@ -29,6 +29,7 @@ fn main() {
 
 struct Splash;
 fn add_splash(mut commands: Commands){
+    commands.spawn(Camera2d);
     // Here you can use with_assets, or push_asset to add some assets to load
     let wait_resources = LoadFiles::from_duration(3.0);
     commands.insert_resource(wait_resources);
