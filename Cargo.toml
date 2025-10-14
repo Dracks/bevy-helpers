@@ -9,9 +9,11 @@ resolver="2"
 
 [workspace.dependencies]
 assets_generator = {path="crates/assets_generator"}
+assets_generator_macro = {path="crates/assets_generator_macro"}
 ui_helpers = {path="crates/ui_helpers"}
 bevy = { version = "0.17.2" }
 
 [dependencies]
 bevy = { workspace = true }
 ui_helpers = { workspace = true }
+assets_generator = {workspace = true }

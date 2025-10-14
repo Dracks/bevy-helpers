@@ -1,114 +1,18 @@
-use std::fs;
-use std::io::Write;
-use std::path::Path;
-use stringcase::Caser;
+use bevy::{asset::{Asset, AssetServer, Handle}, scene::Scene};
 
-pub fn build_assets_enum(dest_path: &Path, src_path: Option<&Path>, name: Option<String>){
-    let name = name.unwrap_or("FileAssets".into());
-    let mut f = fs::File::create(&dest_path).unwrap();
-    let src_path = src_path.unwrap_or(Path::new("assets"));
-    writeln!(f, "use bevy::prelude::*;").unwrap();
-    writeln!(f).unwrap();
-    writeln!(f, "#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]").unwrap();
-    writeln!(f, "pub enum {name} {{").unwrap();
+pub trait AssetsTools {
+    fn path(&self) -> &str;
 
-    let assets = collect_assets(src_path).unwrap_or_default();
-
-    for (enum_name, _) in &assets {
-        writeln!(f, "    #[allow(dead_code)]").unwrap();
-        writeln!(f, "    {},", enum_name).unwrap();
+    fn load<I: Asset>(&self, assets: &AssetServer) -> Handle<I> {
+        assets.load(self.path().to_string())
     }
 
-    writeln!(f, "}}\n").unwrap();
-
-    writeln!(f, "impl {name} {{").unwrap();
-    writeln!(f, "    pub fn path(&self) -> &'static str {{").unwrap();
-    writeln!(f, "        match self {{").unwrap();
-
-    for (enum_name, file_path) in assets {
-        writeln!(f, "            {name}::{} => \"{}\",", enum_name, file_path).unwrap();
-    }
-
-    writeln!(f, "        }}").unwrap();
-    writeln!(f, "    }}").unwrap();
-    writeln!(f).unwrap();
-    writeln!(f, "    #[allow(dead_code)]").unwrap();
-    writeln!(f, "    pub fn scene(&self, scene_nr: i32) -> String {{").unwrap();
-    writeln!(
-        f,
-        "        format!(\"{{}}#Scene{{scene_nr}}\", self.path())"
-    )
-    .unwrap();
-    writeln!(f, "    }}").unwrap();
-    writeln!(f).unwrap();
-    writeln!(f, "    #[allow(dead_code)]").unwrap();
-    writeln!(f, "    pub fn load<'a, A: Asset>(&self, assets: &Res<AssetServer>) -> Handle<A> {{").unwrap();
-    writeln!(f, "        assets.load(self.path())").unwrap();
-    writeln!(f, "    }}").unwrap();
-    writeln!(f, "}}").unwrap();
-
-    println!("cargo:rerun-if-changed=assets");
-}
-fn collect_assets(dir: &Path) -> Result<Vec<(String, String)>, std::io::Error> {
-    let mut assets = Vec::new();
-    collect_assets_recursive(dir, dir.to_str().unwrap_or_default(), &mut assets)?;
-    Ok(assets)
-}
-
-fn collect_assets_recursive(
-    current_dir: &Path,
-    base_dir: &str,
-    assets: &mut Vec<(String, String)>,
-) -> Result<(), std::io::Error> {
-    for entry in fs::read_dir(current_dir)? {
-        let entry = entry?;
-        let path = entry.path();
-
-        if path.is_dir() {
-            // Recursively process subdirectories
-            collect_assets_recursive(&path, base_dir, assets)?;
-        } else if path.is_file() {
-            if let Some(_) = path.file_stem() {
-                // Get relative path from base assets directory
-                let relative_path = path
-                    .strip_prefix(base_dir)
-                    .unwrap_or(&path)
-                    .to_string_lossy()
-                    .replace('\\', "/"); // Ensure forward slashes for consistency
-
-                // Convert path to a valid Rust enum variant name (includes path to avoid collisions)
-                let enum_name = sanitize_enum_name(&relative_path);
-
-                assets.push((enum_name, relative_path.to_string()));
-            }
-        }
-    }
-    Ok(())
-}
-
-fn sanitize_enum_name(relative_path: &str) -> String {
-    // Use the full relative path to avoid collisions
-    let path_without_extension = if let Some(dot_pos) = relative_path.rfind('.') {
-        &relative_path[..dot_pos]
-    } else {
-        relative_path
-    };
-
-
-    // Convert path separators and special characters to underscores
-    let sanitized = path_without_extension
-        .chars()
-        .map(|c| if c.is_alphanumeric() { c } else { '_' })
-        .collect::<String>();
-
-    let pascal_case = sanitized.to_pascal_case();
-
-    // Ensure the name doesn't start with a number
-    if pascal_case.chars().next().map_or(false, |c| c.is_numeric()) {
-        format!("Asset{}", pascal_case)
-    } else if pascal_case.is_empty() {
-        "UnknownAsset".to_string()
-    } else {
-        pascal_case
+    fn load_scene(&self, assets: &AssetServer, scene_nr: u32) -> Handle<Scene> {
+        let path = format!("{}#Scene({scene_nr})", self.path());
+        assets.load(path)
     }
 }
+
+
+// Re-export the procedural macro
+pub use assets_generator_macro::assets_enum;

@@ -1,7 +1,9 @@
 [package]
 name = "assets_generator"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2024"
 
+
 [dependencies]
-stringcase = "0.4.0"
+assets_generator_macro = { workspace = true }
+bevy = {workspace = true}
