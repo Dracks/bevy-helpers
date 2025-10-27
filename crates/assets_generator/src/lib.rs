@@ -87,16 +87,8 @@ fn collect_assets_recursive(
 }
 
 fn sanitize_enum_name(relative_path: &str) -> String {
-    // Use the full relative path to avoid collisions
-    let path_without_extension = if let Some(dot_pos) = relative_path.rfind('.') {
-        &relative_path[..dot_pos]
-    } else {
-        relative_path
-    };
-
-
     // Convert path separators and special characters to underscores
-    let sanitized = path_without_extension
+    let sanitized = relative_path
         .chars()
         .map(|c| if c.is_alphanumeric() { c } else { '_' })
         .collect::<String>();
