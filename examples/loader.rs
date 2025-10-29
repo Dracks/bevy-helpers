@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use ui_helpers::prelude::*;
 
 #[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
-enum AppState{
+enum AppState {
     #[default]
     Splash,
     MainMenu,
@@ -17,10 +17,7 @@ fn main() {
         .init_state::<AppState>()
         .add_systems(Startup, add_splash)
         .add_systems(OnExit(AppState::Splash), clean_entities::<Splash>)
-        .add_systems(OnEnter(AppState::MainMenu), show_main_menu)
-    ;
-
-
+        .add_systems(OnEnter(AppState::MainMenu), show_main_menu);
 
     app.run();
 }
@@ -28,7 +25,7 @@ fn main() {
 #[derive(Component)]
 
 struct Splash;
-fn add_splash(mut commands: Commands){
+fn add_splash(mut commands: Commands) {
     commands.spawn(Camera2d);
     // Here you can use with_assets, or push_asset to add some assets to load
     let wait_resources = LoadFiles::from_duration(3.0);
@@ -44,15 +41,11 @@ fn add_splash(mut commands: Commands){
             ..default()
         },
         TextColor(Color::WHITE),
-        Text::new("Splash screen")
+        Text::new("Splash screen"),
     ));
 }
 
-
-fn show_main_menu(mut commands: Commands){
+fn show_main_menu(mut commands: Commands) {
     bevy::log::info!("Show Main Menu");
-    commands.spawn((
-        Node::default(),
-        Text::new("Main Menu")
-    ));
+    commands.spawn((Node::default(), Text::new("Main Menu")));
 }

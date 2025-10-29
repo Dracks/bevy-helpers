@@ -3,7 +3,7 @@ use std::io::Write;
 use std::path::Path;
 use stringcase::Caser;
 
-pub fn build_assets_enum(dest_path: &Path, src_path: Option<&Path>, name: Option<String>){
+pub fn build_assets_enum(dest_path: &Path, src_path: Option<&Path>, name: Option<String>) {
     let name = name.unwrap_or("FileAssets".into());
     let mut f = fs::File::create(&dest_path).unwrap();
     let src_path = src_path.unwrap_or(Path::new("assets"));
