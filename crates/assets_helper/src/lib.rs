@@ -1,7 +1,4 @@
-use bevy::{
-    asset::{Asset, AssetServer, Handle},
-    ecs::system::Res,
-};
+use bevy::asset::{Asset, AssetServer, Handle};
 
 pub trait AssetsTrait {
     fn path(&self) -> &'static str;
@@ -10,7 +7,7 @@ pub trait AssetsTrait {
         format!("{}#Scene{scene_nr}", self.path())
     }
 
-    fn load<'a, A: Asset>(&self, assets: &Res<AssetServer>) -> Handle<A> {
+    fn load<'a, A: Asset>(&self, assets: &AssetServer) -> Handle<A> {
         assets.load(self.path())
     }
 }
