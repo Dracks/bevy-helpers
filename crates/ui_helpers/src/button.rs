@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, ui::InteractionDisabled};
 
 #[derive(Component)]
 pub struct Action<T: Message + Copy> {
@@ -23,7 +23,14 @@ impl<T: Message + Copy> Hover<T> {
 }
 
 pub fn button_press_system<T: Message + Copy>(
-    buttons: Query<(&Interaction, &Action<T>), (Changed<Interaction>, With<Button>)>,
+    buttons: Query<
+        (&Interaction, &Action<T>),
+        (
+            Changed<Interaction>,
+            With<Button>,
+            Without<InteractionDisabled>,
+        ),
+    >,
     mut action_evw: MessageWriter<T>,
 ) {
     for (interaction, action) in buttons.iter() {
@@ -34,7 +41,14 @@ pub fn button_press_system<T: Message + Copy>(
 }
 
 pub fn button_hover_system<T: Message + Copy>(
-    buttons: Query<(&Interaction, &Hover<T>), (Changed<Interaction>, With<Button>)>,
+    buttons: Query<
+        (&Interaction, &Hover<T>),
+        (
+            Changed<Interaction>,
+            With<Button>,
+            Without<InteractionDisabled>,
+        ),
+    >,
     mut action_evw: MessageWriter<T>,
 ) {
     for (interaction, action) in buttons.iter() {
