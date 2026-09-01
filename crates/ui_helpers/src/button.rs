@@ -1,6 +1,6 @@
 use bevy::{prelude::*, ui::InteractionDisabled};
 
-#[derive(Component)]
+#[derive(Component, Clone)]
 pub struct Action<T: Message + Copy> {
     evt: T,
 }
@@ -8,6 +8,12 @@ pub struct Action<T: Message + Copy> {
 impl<T: Message + Copy> Action<T> {
     pub fn new(evt: T) -> Self {
         Self { evt }
+    }
+}
+
+impl<T: Default + Message + Copy> Default for Action<T> {
+    fn default() -> Self {
+        Action::new(T::default())
     }
 }
 
