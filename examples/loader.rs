@@ -37,7 +37,7 @@ fn add_splash(mut commands: Commands) {
         Loading::new(AppState::MainMenu),
         Node::default(),
         TextFont {
-            font_size: 67.0,
+            font_size: FontSize::Px(67.0),
             ..default()
         },
         TextColor(Color::WHITE),
