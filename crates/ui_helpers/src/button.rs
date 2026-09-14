@@ -1,34 +1,34 @@
 use bevy::{prelude::*, ui::InteractionDisabled};
 
 #[derive(Component, Clone)]
-pub struct Action<T: Message + Copy> {
+pub struct Action<T: Message + Clone> {
     evt: T,
 }
 
-impl<T: Message + Copy> Action<T> {
+impl<T: Message + Clone> Action<T> {
     pub fn new(evt: T) -> Self {
         Self { evt }
     }
 }
 
-impl<T: Default + Message + Copy> Default for Action<T> {
+impl<T: Default + Message + Clone> Default for Action<T> {
     fn default() -> Self {
         Action::new(T::default())
     }
 }
 
 #[derive(Component)]
-pub struct Hover<T: Message + Copy> {
+pub struct Hover<T: Message + Clone> {
     evt: T,
 }
 
-impl<T: Message + Copy> Hover<T> {
+impl<T: Message + Clone> Hover<T> {
     pub fn new(evt: T) -> Self {
         Self { evt }
     }
 }
 
-pub fn button_press_system<T: Message + Copy>(
+pub fn button_press_system<T: Message + Clone>(
     buttons: Query<
         (&Interaction, &Action<T>),
         (
@@ -41,12 +41,12 @@ pub fn button_press_system<T: Message + Copy>(
 ) {
     for (interaction, action) in buttons.iter() {
         if *interaction == Interaction::Pressed {
-            action_evw.write(action.evt);
+            action_evw.write(action.evt.clone());
         }
     }
 }
 
-pub fn button_hover_system<T: Message + Copy>(
+pub fn button_hover_system<T: Message + Clone>(
     buttons: Query<
         (&Interaction, &Hover<T>),
         (
@@ -59,7 +59,7 @@ pub fn button_hover_system<T: Message + Copy>(
 ) {
     for (interaction, action) in buttons.iter() {
         if *interaction == Interaction::Hovered {
-            action_evw.write(action.evt);
+            action_evw.write(action.evt.clone());
         }
     }
 }
